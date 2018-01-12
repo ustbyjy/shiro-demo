@@ -40,11 +40,13 @@
         <property name="securityManager" ref="securityManager" />
     </bean>
 
+    <!-- id必须与web.xml中class为DelegatingFilterProxy的Filter的name一致，否则启动失败 -->
     <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
         <property name="securityManager" ref="securityManager" />
         <property name="loginUrl" value="/login.jsp" />
         <property name="successUrl" value="/list.jsp" />
         <property name="unauthorizedUrl" value="/unauthorized.jsp" />
+        <!-- URL权限采用第一次匹配优先的方式 -->
         <property name="filterChainDefinitions">
             <value>
                 /login.jsp = anon
