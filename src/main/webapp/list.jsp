@@ -7,5 +7,6 @@
 </head>
 <body>
 <h1>List</h1>
+<a href="/shiro/logout">Logout</a>
 </body>
 </html>

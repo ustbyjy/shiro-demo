@@ -23,14 +23,43 @@
 
     <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
         <property name="cacheManager" ref="cacheManager" />
-        <property name="realm" ref="shiroRealm" />
+        <property name="authenticator" ref="authenticator" />
+        <property name="realms">
+            <list>
+                <ref bean="firstRealm" />
+                <ref bean="secondRealm" />
+            </list>
+        </property>
     </bean>
 
     <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
         <property name="cacheManagerConfigFile" value="classpath:ehcache.xml" />
     </bean>
 
-    <bean id="shiroRealm" class="com.yjy.shiro.ShiroRealm" />
+    <bean id="authenticator" class="org.apache.shiro.authc.pam.ModularRealmAuthenticator">
+        <!-- 配置多Realm认证策略，AtLeastOneSuccessfulStrategy（默认）：至少有一个成功，AllSuccessfulStrategy：都必须成功，FirstSuccessfulStrategy：第一个成功即可 -->
+        <property name="authenticationStrategy">
+            <bean class="org.apache.shiro.authc.pam.AllSuccessfulStrategy" />
+        </property>
+    </bean>
+
+    <bean id="firstRealm" class="com.yjy.shiro.FirstRealm">
+        <property name="credentialsMatcher">
+            <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+                <property name="hashAlgorithmName" value="MD5" />
+                <property name="hashIterations" value="3" />
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="secondRealm" class="com.yjy.shiro.SecondRealm">
+        <property name="credentialsMatcher">
+            <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+                <property name="hashAlgorithmName" value="SHA1" />
+                <property name="hashIterations" value="3" />
+            </bean>
+        </property>
+    </bean>
 
     <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
 
@@ -47,9 +76,12 @@
         <property name="successUrl" value="/list.jsp" />
         <property name="unauthorizedUrl" value="/unauthorized.jsp" />
         <!-- URL权限采用第一次匹配优先的方式 -->
+        <!-- anon：匿名访问，logout：登出，authc：需要认证 -->
         <property name="filterChainDefinitions">
             <value>
                 /login.jsp = anon
+                /shiro/login = anon
+                /shiro/logout = logout
                 /** = authc
             </value>
         </property>
