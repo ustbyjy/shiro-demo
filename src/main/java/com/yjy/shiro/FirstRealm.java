@@ -1,13 +1,19 @@
 package com.yjy.shiro;
 
 import org.apache.shiro.authc.*;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.crypto.hash.SimpleHash;
-import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FirstRealm extends AuthenticatingRealm {
+import java.util.HashSet;
+import java.util.Set;
+
+public class FirstRealm extends AuthorizingRealm {
     private static Logger logger = LoggerFactory.getLogger(FirstRealm.class);
 
     @Override
@@ -48,5 +54,21 @@ public class FirstRealm extends AuthenticatingRealm {
 
         Object result = new SimpleHash(hashAlgorithmName, credentials, credentialsSalt, hashIterations);
         logger.info(result.toString());
+    }
+
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+        logger.info("doGetAuthorizationInfo");
+        Object principal = principals.getPrimaryPrincipal();
+
+        Set<String> roles = new HashSet<String>();
+        roles.add("user");
+        if ("admin".equals(principal)) {
+            roles.add("admin");
+        }
+
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(roles);
+
+        return info;
     }
 }
