@@ -23,6 +23,7 @@
     </bean>
 
     <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="sessionManager" ref="sessionManager" />
         <property name="cacheManager" ref="cacheManager" />
         <property name="authenticator" ref="authenticator" />
         <property name="realms">
@@ -31,10 +32,35 @@
                 <ref bean="secondRealm" />
             </list>
         </property>
+        <!-- 修改rememberMe cookie的过期时间 -->
+        <property name="rememberMeManager.cookie.maxAge" value="60" />
     </bean>
 
     <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
         <property name="cacheManagerConfigFile" value="classpath:ehcache.xml" />
+    </bean>
+
+    <bean id="redisSessionDao" class="com.yjy.dao.RedisSessionDao" />
+    <bean id="simpleCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+        <!-- 设置session的cookie name -->
+        <constructor-arg name="name" value="custom.session" />
+        <property name="path" value="/" />
+        <!-- cookie过期时间，60秒 -->
+        <property name="maxAge" value="60" />
+    </bean>
+    <bean id="sessionValidationScheduler" class="org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler">
+        <!-- 任务时间间隔，10秒1次 -->
+        <property name="interval" value="10000" />
+        <property name="sessionManager" ref="sessionManager" />
+    </bean>
+    <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+        <!-- 应用本地session过期时间，60秒 -->
+        <property name="globalSessionTimeout" value="60000" />
+        <property name="sessionDAO" ref="redisSessionDao" />
+        <property name="sessionIdCookie" ref="simpleCookie" />
+        <!-- 开启验证session是否过期的定时任务 -->
+        <property name="sessionValidationSchedulerEnabled" value="true" />
+        <property name="sessionValidationScheduler" ref="sessionValidationScheduler" />
     </bean>
 
     <bean id="authenticator" class="org.apache.shiro.authc.pam.ModularRealmAuthenticator">
@@ -52,7 +78,6 @@
             </bean>
         </property>
     </bean>
-
     <bean id="secondRealm" class="com.yjy.shiro.SecondRealm">
         <property name="credentialsMatcher">
             <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
@@ -62,10 +87,11 @@
         </property>
     </bean>
 
+    <!-- Shiro生命周期处理器，在实现了Initializable接口的Shiro bean初始化时调用Initializable接口回调，在实现了Destroyable接口的Shiro bean销毁时调用 Destroyable接口回调 -->
     <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
 
+    <!-- 开启Shiro注解的Spring配置方式的beans，在lifecycleBeanPostProcessor之后运行 -->
     <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor" />
-
     <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
         <property name="securityManager" ref="securityManager" />
     </bean>
@@ -83,8 +109,9 @@
                 /login.jsp = anon
                 /shiro/login = anon
                 /shiro/logout = logout
-                /user.jsp = roles[user]
-                /admin.jsp = roles[admin]
+                /user.jsp = authc,roles[user]
+                /admin.jsp = authc,roles[admin]
+                /list.jsp = user
                 /** = authc
             </value>
         </property>

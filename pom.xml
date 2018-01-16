@@ -11,11 +11,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdk.version>1.8</jdk.version>
         <junit.version>4.12</junit.version>
-        <spring.version>4.3.10.RELEASE</spring.version>
-        <mybatis.version>3.4.5</mybatis.version>
-        <mybatis-spring.version>1.3.1</mybatis-spring.version>
-        <mysql.version>5.1.45</mysql.version>
-        <druid.version>1.1.6</druid.version>
+        <spring.version>4.3.13.RELEASE</spring.version>
         <slf4j.version>1.7.25</slf4j.version>
         <logback.version>1.2.3</logback.version>
         <commons-logging.version>1.2</commons-logging.version>
@@ -24,6 +20,8 @@
         <jstl.version>1.2</jstl.version>
         <shiro.version>1.4.0</shiro.version>
         <ehcache.version>3.4.0</ehcache.version>
+        <jedis.version>2.9.0</jedis.version>
+        <spring-data-redis.version>1.8.9.RELEASE</spring-data-redis.version>
     </properties>
     <dependencies>
         <!-- 单元测试 -->
@@ -53,28 +51,6 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>${commons-logging.version}</version>
-        </dependency>
-        <!-- 数据库 -->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>${druid.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <version>${mybatis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis-spring</artifactId>
-            <version>${mybatis-spring.version}</version>
         </dependency>
         <!-- Servlet -->
         <dependency>
@@ -133,6 +109,11 @@
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
+            <version>${spring-data-redis.version}</version>
+        </dependency>
         <!-- Commons -->
         <dependency>
             <groupId>commons-collections</groupId>
@@ -182,6 +163,12 @@
                     <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- Redis -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${jedis.version}</version>
         </dependency>
     </dependencies>
 

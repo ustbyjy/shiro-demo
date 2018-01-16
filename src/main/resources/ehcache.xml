@@ -18,7 +18,7 @@
   -->
 <ehcache updateCheck="false">
 
-    <diskStore path="java.io.tmpdir/shiro-ehcache" />
+    <diskStore path="java.io.tmp/shiro-ehcache" />
 
     <defaultCache
             maxElementsInMemory="1000"
